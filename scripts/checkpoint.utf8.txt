@@ -1,0 +1,59 @@
+param(
+  [Parameter(Mandatory = $true)]
+  [string]$Name,
+
+  [Parameter(Mandatory = $false)]
+  [string]$Message = ""
+)
+
+# ---------- Helpers ----------
+function Fail($msg) {
+  Write-Host "✖ $msg" -ForegroundColor Red
+  exit 1
+}
+
+# ---------- Branch info ----------
+$branch = git branch --show-current
+if (-not $branch) {
+  Fail "Detached HEAD state. Create or switch to a branch before checkpoint."
+}
+
+Write-Host "→ Branch: $branch" -ForegroundColor DarkGray
+
+# ---------- Message ----------
+if (-not $Message -or $Message.Trim() -eq "") {
+  $Message = "checkpoint: $Name"
+}
+
+# ---------- Changes check ----------
+$changes = git status --porcelain
+if (-not $changes) {
+  Write-Host "ℹ No changes detected. Skipping commit." -ForegroundColor Yellow
+} else {
+  Write-Host "→ Committing changes..." -ForegroundColor Cyan
+  git add -A
+  git commit -m $Message
+  if ($LASTEXITCODE -ne 0) { Fail "git commit failed" }
+}
+
+# ---------- Push branch ----------
+Write-Host "→ Pushing branch..." -ForegroundColor Cyan
+git push
+if ($LASTEXITCODE -ne 0) { Fail "git push failed" }
+
+# ---------- Tag check ----------
+$existingTag = git tag -l $Name
+if ($existingTag) {
+  Write-Host "ℹ Tag '$Name' already exists. Skipping tag creation." -ForegroundColor Yellow
+} else {
+  Write-Host "→ Creating tag: $Name" -ForegroundColor Cyan
+  git tag $Name
+  if ($LASTEXITCODE -ne 0) { Fail "git tag failed" }
+
+  git push origin $Name
+  if ($LASTEXITCODE -ne 0) { Fail "git push tag failed" }
+}
+
+# ---------- Done ----------
+Write-Host "Checkpoint completed: $Name" -ForegroundColor Green
+
