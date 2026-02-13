@@ -25,13 +25,16 @@ export function MotionBottomSheet({ visible, onClose, children }: MotionBottomSh
   }, [visible, progress]);
 
   const backdropStyle = useAnimatedStyle(() => ({
-    opacity: interpolate(progress.value, [0, 1], [0, 0.5]),
+    opacity: interpolate(progress.value, [0, 1], [0, 0.62]),
   }));
 
   const sheetStyle = useAnimatedStyle(() => ({
     transform: [
       {
-        translateY: interpolate(progress.value, [0, 1], [motion.easing.sheetEnterY, 0]),
+        translateY: interpolate(progress.value, [0, 1], [motion.easing.sheetEnterY + 24, 0]),
+      },
+      {
+        scale: interpolate(progress.value, [0, 1], [0.97, 1]),
       },
     ],
     opacity: progress.value,
@@ -59,14 +62,18 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    backgroundColor: '#151821',
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    backgroundColor: '#141927',
     borderWidth: 1,
-    borderColor: '#252a38',
+    borderColor: '#2f3852',
     paddingHorizontal: 18,
     paddingTop: 18,
     paddingBottom: 28,
     minHeight: 220,
+    shadowColor: '#5b76ff',
+    shadowOpacity: 0.25,
+    shadowRadius: 20,
+    shadowOffset: { width: 0, height: -6 },
   },
 });

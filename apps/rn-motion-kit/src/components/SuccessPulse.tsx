@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import Animated, { interpolate, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated';
+import Animated, { Easing, interpolate, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated';
 
 export function SuccessPulse() {
   const p = useSharedValue(0);
 
   useEffect(() => {
-    p.value = withRepeat(withTiming(1, { duration: 1200 }), -1, false);
+    p.value = withRepeat(withTiming(1, { duration: 1500, easing: Easing.inOut(Easing.sin) }), -1, false);
   }, [p]);
 
   const ring = useAnimatedStyle(() => ({
