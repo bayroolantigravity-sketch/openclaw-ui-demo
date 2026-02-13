@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { MotionBottomSheet } from '../components/MotionBottomSheet';
+import { SuccessPulse } from '../components/SuccessPulse';
 
 type RootStackParamList = {
   Home: undefined;
@@ -21,6 +22,8 @@ export default function DetailScreen({ route }: Props) {
       <Pressable style={styles.button} onPress={() => setOpen(true)}>
         <Text style={styles.buttonText}>Open Motion Sheet</Text>
       </Pressable>
+
+      <SuccessPulse />
 
       <MotionBottomSheet visible={open} onClose={() => setOpen(false)}>
         <Text style={styles.sheetTitle}>Bottom Sheet</Text>
