@@ -1,0 +1,111 @@
+[
+  {
+    "name": "border-beam",
+    "sourceUrl": "https://21st.dev/r/magicui/border-beam",
+    "sourceType": "url_success",
+    "registryItem": {
+      "name": "border-beam",
+      "type": "registry:ui",
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "/components/ui/border-beam.tsx",
+          "content": "import { cn } from \"@/lib/utils\"\n\ninterface BorderBeamProps {\n  className?: string\n  size?: number\n  duration?: number\n  borderWidth?: number\n  anchor?: number\n  colorFrom?: string\n  colorTo?: string\n  delay?: number\n}\n\nexport const BorderBeam = ({\n  className,\n  size = 200,\n  duration = 15,\n  anchor = 90,\n  borderWidth = 1.5,\n  colorFrom = \"#ffaa40\",\n  colorTo = \"#9c40ff\",\n  delay = 0,\n}: BorderBeamProps) => {\n  return (\n    <div\n      style={\n        {\n          \"--size\": size,\n          \"--duration\": duration,\n          \"--anchor\": anchor,\n          \"--border-width\": borderWidth,\n          \"--color-from\": colorFrom,\n          \"--color-to\": colorTo,\n          \"--delay\": `-${delay}s`,\n        } as React.CSSProperties\n      }\n      className={cn(\n        \"pointer-events-none absolute inset-0 rounded-[inherit] [border:calc(var(--border-width)*1px)_solid_transparent]\",\n\n        // mask styles\n        \"![mask-clip:padding-box,border-box] ![mask-composite:intersect] [mask:linear-gradient(transparent,transparent),linear-gradient(white,white)]\",\n\n        // pseudo styles\n        \"after:absolute after:aspect-square after:w-[calc(var(--size)*1px)] after:animate-border-beam after:[animation-delay:var(--delay)] after:[background:linear-gradient(to_left,var(--color-from),var(--color-to),transparent)] after:[offset-anchor:calc(var(--anchor)*1%)_50%] after:[offset-path:rect(0_auto_auto_0_round_calc(var(--size)*1px))]\",\n        className,\n      )}\n    />\n  )\n}\n",
+          "type": "registry:ui",
+          "target": ""
+        }
+      ],
+      "cssVars": {
+        "theme": {
+          "animate-border-beam": "border-beam calc(var(--duration)*1s) infinite linear"
+        }
+      },
+      "css": {
+        "@keyframes border-beam": {
+          "100%": {
+            "offset-distance": "100%"
+          }
+        }
+      },
+      "tailwind": {
+        "config": {
+          "theme": {
+            "extend": {
+              "animation": {
+                "border-beam": "border-beam calc(var(--duration)*1s) infinite linear"
+              },
+              "keyframes": {
+                "border-beam": {
+                  "100%": {
+                    "offset-distance": "100%"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "addedByCLI": true
+  },
+  {
+    "name": "confetti",
+    "sourceUrl": "https://21st.dev/r/magicui/confetti",
+    "sourceType": "url_success",
+    "registryItem": {
+      "name": "confetti",
+      "type": "registry:ui",
+      "dependencies": [
+        "canvas-confetti",
+        "@radix-ui/react-slot",
+        "class-variance-authority"
+      ],
+      "registryDependencies": [
+        "https://21st.dev/r/shadcn/button"
+      ],
+      "files": [
+        {
+          "path": "/components/ui/confetti.tsx",
+          "content": "import type { ReactNode } from \"react\"\nimport React, {\n  createContext,\n  forwardRef,\n  useCallback,\n  useEffect,\n  useImperativeHandle,\n  useMemo,\n  useRef,\n} from \"react\"\nimport type {\n  GlobalOptions as ConfettiGlobalOptions,\n  CreateTypes as ConfettiInstance,\n  Options as ConfettiOptions,\n} from \"canvas-confetti\"\nimport confetti from \"canvas-confetti\"\n\nimport { Button, ButtonProps } from \"@/components/ui/button\"\n\ntype Api = {\n  fire: (options?: ConfettiOptions) => void\n}\n\ntype Props = React.ComponentPropsWithRef<\"canvas\"> & {\n  options?: ConfettiOptions\n  globalOptions?: ConfettiGlobalOptions\n  manualstart?: boolean\n  children?: ReactNode\n}\n\nexport type ConfettiRef = Api | null\n\nconst ConfettiContext = createContext<Api>({} as Api)\n\nconst Confetti = forwardRef<ConfettiRef, Props>((props, ref) => {\n  const {\n    options,\n    globalOptions = { resize: true, useWorker: true },\n    manualstart = false,\n    children,\n    ...rest\n  } = props\n  const instanceRef = useRef<ConfettiInstance | null>(null) // confetti instance\n\n  const canvasRef = useCallback(\n    // https://react.dev/reference/react-dom/components/common#ref-callback\n    // https://reactjs.org/docs/refs-and-the-dom.html#callback-refs\n    (node: HTMLCanvasElement) => {\n      if (node !== null) {\n        // <canvas> is mounted => create the confetti instance\n        if (instanceRef.current) return // if not already created\n        instanceRef.current = confetti.create(node, {\n          ...globalOptions,\n          resize: true,\n        })\n      } else {\n        // <canvas> is unmounted => reset and destroy instanceRef\n        if (instanceRef.current) {\n          instanceRef.current.reset()\n          instanceRef.current = null\n        }\n      }\n    },\n    [globalOptions],\n  )\n\n  // `fire` is a function that calls the instance() with `opts` merged with `options`\n  const fire = useCallback(\n    (opts = {}) => instanceRef.current?.({ ...options, ...opts }),\n    [options],\n  )\n\n  const api = useMemo(\n    () => ({\n      fire,\n    }),\n    [fire],\n  )\n\n  useImperativeHandle(ref, () => api, [api])\n\n  useEffect(() => {\n    if (!manualstart) {\n      fire()\n    }\n  }, [manualstart, fire])\n\n  return (\n    <ConfettiContext.Provider value={api}>\n      <canvas ref={canvasRef} {...rest} />\n      {children}\n    </ConfettiContext.Provider>\n  )\n})\n\ninterface ConfettiButtonProps extends ButtonProps {\n  options?: ConfettiOptions &\n    ConfettiGlobalOptions & { canvas?: HTMLCanvasElement }\n  children?: React.ReactNode\n}\n\nfunction ConfettiButton({ options, children, ...props }: ConfettiButtonProps) {\n  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {\n    const rect = event.currentTarget.getBoundingClientRect()\n    const x = rect.left + rect.width / 2\n    const y = rect.top + rect.height / 2\n    confetti({\n      ...options,\n      origin: {\n        x: x / window.innerWidth,\n        y: y / window.innerHeight,\n      },\n    })\n  }\n\n  return (\n    <Button onClick={handleClick} {...props}>\n      {children}\n    </Button>\n  )\n}\n\nConfetti.displayName = \"Confetti\"\n\nexport { Confetti, ConfettiButton }\n",
+          "type": "registry:ui",
+          "target": ""
+        },
+        {
+          "path": "/components/ui/button.tsx",
+          "content": "import * as React from \"react\"\nimport { Slot } from \"@radix-ui/react-slot\"\nimport { cva, type VariantProps } from \"class-variance-authority\"\n\nimport { cn } from \"@/lib/utils\"\n\nconst buttonVariants = cva(\n  \"inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50\",\n  {\n    variants: {\n      variant: {\n        default: \"bg-primary text-primary-foreground hover:bg-primary/90\",\n        destructive:\n          \"bg-destructive text-destructive-foreground hover:bg-destructive/90\",\n        outline:\n          \"border border-input bg-background hover:bg-accent hover:text-accent-foreground\",\n        secondary:\n          \"bg-secondary text-secondary-foreground hover:bg-secondary/80\",\n        ghost: \"hover:bg-accent hover:text-accent-foreground\",\n        link: \"text-primary underline-offset-4 hover:underline\",\n      },\n      size: {\n        default: \"h-10 px-4 py-2\",\n        sm: \"h-9 rounded-md px-3\",\n        lg: \"h-11 rounded-md px-8\",\n        icon: \"h-10 w-10\",\n      },\n    },\n    defaultVariants: {\n      variant: \"default\",\n      size: \"default\",\n    },\n  },\n)\n\nexport interface ButtonProps\n  extends React.ButtonHTMLAttributes<HTMLButtonElement>,\n    VariantProps<typeof buttonVariants> {\n  asChild?: boolean\n}\n\nconst Button = React.forwardRef<HTMLButtonElement, ButtonProps>(\n  ({ className, variant, size, asChild = false, ...props }, ref) => {\n    const Comp = asChild ? Slot : \"button\"\n    return (\n      <Comp\n        className={cn(buttonVariants({ variant, size, className }))}\n        ref={ref}\n        {...props}\n      />\n    )\n  },\n)\nButton.displayName = \"Button\"\n\nexport { Button, buttonVariants }\n",
+          "type": "registry:ui",
+          "target": ""
+        }
+      ],
+      "tailwind": {
+        "config": {}
+      }
+    },
+    "addedByCLI": true
+  },
+  {
+    "name": "magic-card",
+    "sourceUrl": "https://21st.dev/r/magicui/magic-card",
+    "sourceType": "url_success",
+    "registryItem": {
+      "name": "magic-card",
+      "type": "registry:ui",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "/components/ui/magic-card.tsx",
+          "content": "\"use client\"\n\nimport React, { useCallback, useEffect } from \"react\"\nimport { motion, useMotionTemplate, useMotionValue } from \"framer-motion\"\n\nimport { cn } from \"@/lib/utils\"\n\nexport interface MagicCardProps extends React.HTMLAttributes<HTMLDivElement> {\n  gradientSize?: number\n  gradientColor?: string\n  gradientOpacity?: number\n}\n\nexport function MagicCard({\n  children,\n  className,\n  gradientSize = 200,\n  gradientColor = \"#262626\",\n  gradientOpacity = 0.8,\n}: MagicCardProps) {\n  const mouseX = useMotionValue(-gradientSize)\n  const mouseY = useMotionValue(-gradientSize)\n\n  const handleMouseMove = useCallback(\n    (e: React.MouseEvent<HTMLDivElement>) => {\n      const { left, top } = e.currentTarget.getBoundingClientRect()\n      mouseX.set(e.clientX - left)\n      mouseY.set(e.clientY - top)\n    },\n    [mouseX, mouseY],\n  )\n\n  const handleMouseLeave = useCallback(() => {\n    mouseX.set(-gradientSize)\n    mouseY.set(-gradientSize)\n  }, [mouseX, mouseY, gradientSize])\n\n  useEffect(() => {\n    mouseX.set(-gradientSize)\n    mouseY.set(-gradientSize)\n  }, [mouseX, mouseY, gradientSize])\n\n  return (\n    <div\n      onMouseMove={handleMouseMove}\n      onMouseLeave={handleMouseLeave}\n      className={cn(\n        \"group relative flex size-full overflow-hidden rounded-xl bg-neutral-100 dark:bg-neutral-900 border text-black dark:text-white\",\n        className,\n      )}\n    >\n      <div className=\"relative z-10\">{children}</div>\n      <motion.div\n        className=\"pointer-events-none absolute -inset-px rounded-xl opacity-0 transition-opacity duration-300 group-hover:opacity-100\"\n        style={{\n          background: useMotionTemplate`\n            radial-gradient(${gradientSize}px circle at ${mouseX}px ${mouseY}px, ${gradientColor}, transparent 100%)\n          `,\n          opacity: gradientOpacity,\n        }}\n      />\n    </div>\n  )\n}\n",
+          "type": "registry:ui",
+          "target": ""
+        }
+      ],
+      "tailwind": {
+        "config": {}
+      }
+    },
+    "addedByCLI": true
+  }
+]
