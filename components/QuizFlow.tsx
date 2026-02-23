@@ -546,12 +546,13 @@ export default function QuizFlow() {
                             <div className="flex flex-col items-center justify-center px-4 pt-4 sm:pt-6 pb-2 shrink-0 text-center relative">
                                 <DecorativeQuestionNumber number={currentQuestionIndex + 1} />
                                 <motion.div
+                                    key={currentQuestionIndex}
                                     initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ duration: 0.4, ease: "easeOut" }}
                                     className="w-full max-w-md mx-auto flex flex-col items-center justify-center"
                                 >
-                                    <ElegantQuestionTitle text={question.scenario} />
+                                    <ElegantQuestionTitle key={`title-${currentQuestionIndex}`} text={question.scenario} />
                                     {/* Multi-Select Badge — hide on Q1 (gender) */}
                                     {currentQuestionIndex > 0 && (
                                         <motion.div
