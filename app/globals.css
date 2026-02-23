@@ -91,6 +91,49 @@
       offset-distance: 100%;
     }
   }
+
+  --animate-first: moveVertical 30s ease infinite;
+
+  --animate-second: moveInCircle 20s reverse infinite;
+
+  --animate-third: moveInCircle 40s linear infinite;
+
+  --animate-fourth: moveHorizontal 40s ease infinite;
+
+  --animate-fifth: moveInCircle 20s ease infinite;
+  @keyframes moveHorizontal {
+  0% {
+    transform: translateX(-50%) translateY(-10%);
+    }
+  50% {
+    transform: translateX(50%) translateY(10%);
+    }
+  100% {
+    transform: translateX(-50%) translateY(-10%);
+    }
+  }
+  @keyframes moveInCircle {
+  0% {
+    transform: rotate(0deg);
+    }
+  50% {
+    transform: rotate(180deg);
+    }
+  100% {
+    transform: rotate(360deg);
+    }
+  }
+  @keyframes moveVertical {
+  0% {
+    transform: translateY(-50%);
+    }
+  50% {
+    transform: translateY(50%);
+    }
+  100% {
+    transform: translateY(-50%);
+    }
+  }
 }
 
 @media (prefers-color-scheme: dark) {
@@ -210,6 +253,154 @@ body {
   scrollbar-width: none;
 }
 
+/* ── Shimmer Text Animation ──────────────────────────────────────────────── */
+@keyframes shimmer {
+  0% {
+    background-position: -200% center;
+  }
+
+  100% {
+    background-position: 200% center;
+  }
+}
+
+.text-shimmer {
+  background: linear-gradient(90deg,
+      #1a1a1a 0%,
+      #1a1a1a 35%,
+      #888 50%,
+      #1a1a1a 65%,
+      #1a1a1a 100%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+.text-shimmer-light {
+  background: linear-gradient(90deg,
+      #fff 0%,
+      #fff 35%,
+      #ccc 50%,
+      #fff 65%,
+      #fff 100%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 3s ease-in-out infinite;
+}
+
 .font-display {
   font-family: var(--font-display);
 }
+/* -- Gradient Orb Animations -- */
+@keyframes orb-first {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  33% { transform: translate(30px, -50px) rotate(120deg); }
+  66% { transform: translate(-20px, 20px) rotate(240deg); }
+  100% { transform: translate(0, 0) rotate(360deg); }
+}
+@keyframes orb-second {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  33% { transform: translate(-40px, 30px) rotate(-120deg); }
+  66% { transform: translate(25px, -40px) rotate(-240deg); }
+  100% { transform: translate(0, 0) rotate(-360deg); }
+}
+@keyframes orb-third {
+  0% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(35px, 35px) scale(1.05); }
+  66% { transform: translate(-30px, -20px) scale(0.95); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+@keyframes orb-fourth {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(-25px, 40px) rotate(180deg); }
+  100% { transform: translate(0, 0) rotate(360deg); }
+}
+@keyframes orb-fifth {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(30px, -30px) scale(1.08); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+
+.animate-orb-first { animation: orb-first 20s ease-in-out infinite; }
+.animate-orb-second { animation: orb-second 24s ease-in-out infinite; }
+.animate-orb-third { animation: orb-third 28s ease-in-out infinite; }
+.animate-orb-fourth { animation: orb-fourth 22s ease-in-out infinite; }
+.animate-orb-fifth { animation: orb-fifth 26s ease-in-out infinite; }
+
+
+/* -- Gradient Orb Animations -- */
+@keyframes orb-first {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  33% { transform: translate(30px, -50px) rotate(120deg); }
+  66% { transform: translate(-20px, 20px) rotate(240deg); }
+  100% { transform: translate(0, 0) rotate(360deg); }
+}
+@keyframes orb-second {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  33% { transform: translate(-40px, 30px) rotate(-120deg); }
+  66% { transform: translate(25px, -40px) rotate(-240deg); }
+  100% { transform: translate(0, 0) rotate(-360deg); }
+}
+@keyframes orb-third {
+  0% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(35px, 35px) scale(1.05); }
+  66% { transform: translate(-30px, -20px) scale(0.95); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+@keyframes orb-fourth {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(-25px, 40px) rotate(180deg); }
+  100% { transform: translate(0, 0) rotate(360deg); }
+}
+@keyframes orb-fifth {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(30px, -30px) scale(1.08); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+
+.animate-orb-first { animation: orb-first 20s ease-in-out infinite; }
+.animate-orb-second { animation: orb-second 24s ease-in-out infinite; }
+.animate-orb-third { animation: orb-third 28s ease-in-out infinite; }
+.animate-orb-fourth { animation: orb-fourth 22s ease-in-out infinite; }
+.animate-orb-fifth { animation: orb-fifth 26s ease-in-out infinite; }
+
+
+/* -- Gradient Orb Animations -- */
+@keyframes orb-first {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  33% { transform: translate(30px, -50px) rotate(120deg); }
+  66% { transform: translate(-20px, 20px) rotate(240deg); }
+  100% { transform: translate(0, 0) rotate(360deg); }
+}
+@keyframes orb-second {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  33% { transform: translate(-40px, 30px) rotate(-120deg); }
+  66% { transform: translate(25px, -40px) rotate(-240deg); }
+  100% { transform: translate(0, 0) rotate(-360deg); }
+}
+@keyframes orb-third {
+  0% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(35px, 35px) scale(1.05); }
+  66% { transform: translate(-30px, -20px) scale(0.95); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+@keyframes orb-fourth {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(-25px, 40px) rotate(180deg); }
+  100% { transform: translate(0, 0) rotate(360deg); }
+}
+@keyframes orb-fifth {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(30px, -30px) scale(1.08); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+
+.animate-orb-first { animation: orb-first 20s ease-in-out infinite; }
+.animate-orb-second { animation: orb-second 24s ease-in-out infinite; }
+.animate-orb-third { animation: orb-third 28s ease-in-out infinite; }
+.animate-orb-fourth { animation: orb-fourth 22s ease-in-out infinite; }
+.animate-orb-fifth { animation: orb-fifth 26s ease-in-out infinite; }

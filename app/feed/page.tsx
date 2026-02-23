@@ -61,7 +61,7 @@ const cardVariants = {
         opacity: 1,
         y: 0,
         transition: {
-            type: "spring",
+            type: "spring" as const,
             stiffness: 220,
             damping: 22,
             delay: Math.min(i * 0.1, 0.35),
@@ -75,7 +75,7 @@ const badgeVariants = {
         opacity: 1,
         x: 0,
         transition: {
-            type: "spring",
+            type: "spring" as const,
             stiffness: 300,
             damping: 25,
             delay: Math.min(i * 0.1, 0.35) + 0.25,

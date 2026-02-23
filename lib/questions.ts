@@ -20,6 +20,7 @@ export type Option = {
   text: string;
   value: string; // The raw value to save in preferences
   image?: string;
+  imagePosition?: string; // Custom object-position for fine-tuning crop (e.g. "center 20%")
   colors?: string[]; // Color swatches for color palette questions
 };
 
@@ -34,11 +35,11 @@ export type Question = {
 export const initialQuestion: Question = {
   id: "q_gender",
   category: "gender",
-  scenario: "Genellikle hangi kıyafet kategorisinden alışveriş yaparsın?",
+  scenario: "Kimin için alışveriş yapıyorsun?",
   options: [
-    { id: "gen_m", text: "Erkek Giyim", value: "male", image: "/quiz/profile_real_male.png" },
-    { id: "gen_f", text: "Kadın Giyim", value: "female", image: "/quiz/profile_real_female.png" },
-    { id: "gen_u", text: "Unisex", value: "unisex", image: "/quiz/profile_real_unisex.png" }
+    { id: "gen_m", text: "Erkek Giyim", value: "male", image: "/quiz/profile_male_square.png", imagePosition: "center center" },
+    { id: "gen_f", text: "Kadın Giyim", value: "female", image: "/quiz/profile_female_square.png", imagePosition: "center center" },
+    { id: "gen_u", text: "Unisex", value: "unisex", image: "/quiz/profile_unisex_square.png", imagePosition: "center center" }
   ]
 };
 
