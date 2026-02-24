@@ -12,17 +12,16 @@ import { Confetti } from "@/components/ui/confetti";
 
 // ─── Cinematic Text Reveal (powered by 21st.dev TextEffect patterns) ─────
 import { TextEffect } from "@/components/ui/text-effect";
-const ElegantQuestionTitle = ({ text }: { text: string }) => {
+const CinematicFocusTitle = ({ text }: { text: string }) => {
     return (
-        <div className="w-full flex justify-center px-2 sm:px-4">
-            <motion.h3
-                className="text-[1.35rem] leading-[1.3] sm:text-[1.6rem] md:text-[2rem] font-display font-medium tracking-[-0.03em] text-center text-neutral-950"
-                initial={{ opacity: 0, y: 15, filter: "blur(8px)" }}
-                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+        <div className="w-full flex justify-center px-4">
+            <TextEffect
+                per="word"
+                preset="blur"
+                className="text-[1.75rem] leading-[1.2] sm:text-[2.25rem] md:text-[2.75rem] font-display font-medium tracking-[-0.04em] text-center text-neutral-950"
             >
                 {text}
-            </motion.h3>
+            </TextEffect>
         </div>
     );
 };
@@ -302,7 +301,7 @@ const optionsContainerVariants = {
     hidden: { opacity: 0 },
     show: {
         opacity: 1,
-        transition: { staggerChildren: 0.05, delayChildren: 0.1 }
+        transition: { staggerChildren: 0.06, delayChildren: 0.55 }
     }
 };
 
@@ -546,13 +545,13 @@ export default function QuizFlow() {
                             <div className="flex flex-col items-center justify-center px-4 pt-4 sm:pt-6 pb-2 shrink-0 text-center relative">
                                 <DecorativeQuestionNumber number={currentQuestionIndex + 1} />
                                 <motion.div
-                                    key={currentQuestionIndex}
+                                    key={`title-wrapper-${currentQuestionIndex}`}
                                     initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ duration: 0.4, ease: "easeOut" }}
-                                    className="w-full max-w-md mx-auto flex flex-col items-center justify-center"
+                                    className="w-full max-w-md mx-auto flex flex-col items-center justify-center relative z-10"
                                 >
-                                    <ElegantQuestionTitle key={`title-${currentQuestionIndex}`} text={question.scenario} />
+                                    <CinematicFocusTitle text={question.scenario} />
                                     {/* Multi-Select Badge — hide on Q1 (gender) */}
                                     {currentQuestionIndex > 0 && (
                                         <motion.div
