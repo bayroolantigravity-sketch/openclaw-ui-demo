@@ -12,6 +12,8 @@ import { Confetti } from "@/components/ui/confetti";
 
 // ─── Cinematic Text Reveal (powered by 21st.dev TextEffect patterns) ─────
 import { TextEffect } from "@/components/ui/text-effect";
+import { FlipText } from "@/components/ui/flip-text";
+import { LetterReveal } from "@/components/ui/letter-reveal";
 const CinematicFocusTitle = ({ text }: { text: string }) => {
     return (
         <div className="w-full flex justify-center px-4">
@@ -59,11 +61,13 @@ const QuizOptionCard = ({
     isSelected,
     onClick,
     className,
+    layout = "default",
 }: {
     option: Option;
     isSelected: boolean;
     onClick: () => void;
     className?: string;
+    layout?: "default" | "large-image";
 }) => {
     const buttonProps = {
         onClick,
@@ -86,8 +90,7 @@ const QuizOptionCard = ({
             transition: { type: "spring" as const, stiffness: 400, damping: 15 }
         },
         className: [
-            "relative w-full rounded-2xl select-none touch-manipulation group outline-none",
-            className || ""
+            "relative w-full rounded-2xl select-none touch-manipulation group outline-none"
         ].join(" ")
     };
 
@@ -95,10 +98,83 @@ const QuizOptionCard = ({
         : option.text.length % 3 === 1 ? "animate-option-float-reverse"
             : "animate-option-float-slow";
 
-    // ─── Render IMAGE Card (Vertical Stack Format) ───────────────────────────
+    // ─── Render LARGE IMAGE Card ─────────────────────────────────────────────
+    if (layout === "large-image" && option.image) {
+        const isFullWidth = className?.includes("col-span-full");
+        return (
+            <div className={`w-full flex justify-center ${floatClass} ${className || ""}`}>
+                <motion.button
+                    {...buttonProps}
+                    className={`${buttonProps.className} group overflow-hidden flex flex-col items-center w-full mx-auto ${isFullWidth ? "aspect-[2/1] sm:aspect-[2.5/1]" : "aspect-[4/5] sm:aspect-[3/4]"} h-auto border-[0.5px] rounded-[28px] transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${isSelected
+                        ? "border-black ring-[1.5px] ring-black bg-white/95 shadow-[0_16px_40px_-12px_rgba(0,0,0,0.15)] z-10"
+                        : "border-black/5 hover:border-black/10 hover:shadow-[0_12px_30px_rgb(0,0,0,0.08)] bg-white/70 backdrop-blur-xl"
+                        }`}
+                >
+                    {/* Image Area */}
+                    <div className="w-full h-full relative bg-neutral-100 shrink-0 pointer-events-none overflow-hidden p-1.5 sm:p-2 rounded-[28px]">
+                        <div className="relative w-full h-full rounded-[20px] sm:rounded-[24px] overflow-hidden">
+                            <img
+                                src={option.image}
+                                alt={option.text}
+                                style={{ objectPosition: option.imagePosition || "center 10%" }}
+                                className={`absolute inset-0 w-full h-full object-cover transition-transform duration-[800ms] ease-out ${isSelected ? "scale-[1.05]" : "scale-100 group-hover:scale-[1.02]"}`}
+                            />
+                            {/* Premium Gradient Overlay */}
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/0 to-transparent opacity-80" />
+
+                            {/* Inner shadow */}
+                            <div className="absolute inset-0 ring-1 ring-inset ring-black/5 rounded-[20px] sm:rounded-[24px]" />
+                        </div>
+
+                        {/* Checkbox overlay on image (Top Right) */}
+                        <div className="absolute top-4 right-4 shrink-0 flex items-center justify-center pointer-events-none z-10">
+                            <AnimatePresence>
+                                {isSelected ? (
+                                    <motion.div
+                                        initial={{ opacity: 0, scale: 0.5 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        exit={{ opacity: 0, scale: 0.5 }}
+                                        transition={{ duration: 0.2, type: "spring", stiffness: 400, damping: 25 }}
+                                        className="w-[24px] h-[24px] rounded-full bg-black text-white flex items-center justify-center shadow-md"
+                                    >
+                                        <Check className="w-3.5 h-3.5" strokeWidth={3} />
+                                    </motion.div>
+                                ) : (
+                                    <motion.div
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        className="w-[24px] h-[24px] rounded-full border-[1.5px] border-white/80 bg-black/10 backdrop-blur-sm"
+                                    />
+                                )}
+                            </AnimatePresence>
+                        </div>
+
+                        {/* Text Area (Floating Pill Button Style) */}
+                        <div className="absolute bottom-4 sm:bottom-5 left-0 w-full px-3 z-20 flex justify-center pointer-events-none">
+                            <motion.div
+                                className={`w-auto min-w-[110px] sm:min-w-[130px] max-w-[92%] py-2 sm:py-2.5 px-4 sm:px-5 rounded-full flex items-center justify-center backdrop-blur-md transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] overflow-hidden relative ${isSelected
+                                    ? "bg-white text-black shadow-[0_8px_25px_rgba(0,0,0,0.15)] ring-1 ring-black/5"
+                                    : "bg-white/80 text-neutral-800 shadow-sm ring-1 ring-black/[0.04]"
+                                    }`}
+                            >
+                                <p
+                                    className={`relative z-10 leading-tight text-center truncate transition-all duration-300 font-sans ${isSelected ? "font-semibold text-[13px] sm:text-[14px] tracking-[-0.01em]" : "font-medium text-[13px] sm:text-[14px] tracking-[-0.01em]"
+                                        }`}
+                                >
+                                    {option.text}
+                                </p>
+                            </motion.div>
+                        </div>
+                    </div>
+                </motion.button>
+            </div>
+        );
+    }
+
+    // ─── Render NORMAL IMAGE Card (Vertical Stack Format) ───────────────────────────
     if (option.image) {
         return (
-            <div className={`w-full ${floatClass}`}>
+            <div className={`w-full ${floatClass} ${className || ""}`}>
                 <motion.button
                     {...buttonProps}
                     className={`${buttonProps.className} overflow-hidden flex flex-row items-center justify-start w-full border-[0.5px] transition-all duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] ${isSelected
@@ -161,12 +237,12 @@ const QuizOptionCard = ({
 
     // ─── Render TEXT Card ───────────────────────────────────────────────────
     return (
-        <div className={`w-full ${floatClass}`}>
+        <div className={`w-full ${floatClass} ${className || ""}`}>
             <motion.button
                 {...buttonProps}
-                className={`${buttonProps.className} border-[0.5px] overflow-visible p-3.5 sm:p-4 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${isSelected
-                    ? "bg-[#111111]/95 backdrop-blur-2xl border-neutral-800 text-white shadow-[0_16px_40px_-12px_rgba(0,0,0,0.5)] ring-1 ring-white/10"
-                    : "bg-white/70 backdrop-blur-xl border-black/5 hover:border-black/10 text-neutral-800 hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)]"
+                className={`${buttonProps.className} border-[0.5px] overflow-visible p-4 sm:p-5 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${isSelected
+                    ? "bg-white/95 backdrop-blur-3xl border-black ring-[2px] ring-black text-black shadow-[0_16px_40px_-12px_rgba(0,0,0,0.15)] z-10"
+                    : "bg-white/60 backdrop-blur-xl border-black/5 hover:border-black/10 text-neutral-800 hover:shadow-[0_12px_40px_-12px_rgba(0,0,0,0.1)] hover:bg-white/80"
                     }`}
             >
                 <div className="w-full h-full flex items-center gap-3.5 relative pointer-events-none">
@@ -174,16 +250,16 @@ const QuizOptionCard = ({
                     <div className="shrink-0 flex items-center justify-center">
                         <motion.div
                             animate={{
-                                scale: isSelected ? [1, 1.15, 1] : 1,
-                                backgroundColor: isSelected ? "#FFFFFF" : "#FAFAFA",
-                                borderColor: isSelected ? "#FFFFFF" : "#E5E5E5"
+                                scale: isSelected ? [1, 1.2, 1] : 1,
+                                backgroundColor: isSelected ? "#000000" : "#FFFFFF",
+                                borderColor: isSelected ? "#000000" : "#E5E5E5"
                             }}
                             transition={{
-                                scale: { duration: 0.3, ease: "easeOut" },
+                                scale: { duration: 0.4, type: "spring", stiffness: 400, damping: 20 },
                                 backgroundColor: { duration: 0.2 },
                                 borderColor: { duration: 0.2 }
                             }}
-                            className="w-[18px] h-[18px] sm:w-[22px] sm:h-[22px] rounded-full border-[1.5px] flex items-center justify-center"
+                            className="w-[22px] h-[22px] sm:w-[24px] sm:h-[24px] rounded-full border-[1.5px] flex items-center justify-center ring-[3px] ring-white"
                         >
                             <motion.div
                                 initial={false}
@@ -192,15 +268,15 @@ const QuizOptionCard = ({
                                     scale: isSelected ? 1 : 0,
                                 }}
                                 transition={{ type: "spring", stiffness: 500, damping: 25 }}
-                                className="w-[7px] h-[7px] sm:w-[9px] sm:h-[9px] rounded-full bg-neutral-900"
+                                className="w-[8px] h-[8px] sm:w-[10px] sm:h-[10px] rounded-full bg-white"
                             />
                         </motion.div>
                     </div>
 
                     {/* Label */}
-                    <div className="flex-1 text-left flex items-center h-full">
+                    <div className="flex-1 text-center flex items-center justify-center h-full">
                         <p
-                            className={`font-medium text-[14px] sm:text-[15px] leading-snug transition-colors duration-300 ${isSelected ? "font-semibold tracking-[-0.02em] text-white" : "tracking-[-0.01em] text-neutral-700"}`}
+                            className={`font-medium text-[15px] sm:text-[16px] leading-snug transition-colors duration-300 ${isSelected ? "font-semibold tracking-[-0.01em] text-black" : "tracking-[-0.01em] text-neutral-600 font-normal"}`}
                         >
                             {option.text}
                         </p>
@@ -280,7 +356,7 @@ const CATEGORY_ICONS: Record<string, string> = {
 
 // ─── Category-Based Gradient Backgrounds ─────────────────────────────────────
 const CATEGORY_GRADIENTS: Record<string, { bg: string; orb1: string; orb2: string }> = {
-    gender: { bg: "#FDF6F0", orb1: "rgba(245,222,200,0.5)", orb2: "rgba(230,210,190,0.35)" },
+    gender: { bg: "#F4F0EB", orb1: "rgba(225,215,205,0.6)", orb2: "rgba(235,225,215,0.4)" },
     era: { bg: "#FAF5F0", orb1: "rgba(210,180,140,0.4)", orb2: "rgba(190,160,120,0.3)" },
     style: { bg: "#FBF5FA", orb1: "rgba(230,180,220,0.45)", orb2: "rgba(200,170,230,0.35)" },
     color: { bg: "#FFF9F5", orb1: "rgba(255,120,100,0.3)", orb2: "rgba(100,200,180,0.3)" },
@@ -483,53 +559,50 @@ export default function QuizFlow() {
                     }}
                 />
                 {/* Top vignette */}
-                <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-white/40 to-transparent" />
+                <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-[#F6F4F1] to-transparent" />
                 {/* Bottom vignette */}
-                <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-white/30 to-transparent" />
+                <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#EDEAE5] to-transparent" />
             </motion.div>
 
             <div className="w-full h-[100dvh] flex flex-col relative text-neutral-900 overflow-hidden font-sans z-10">
                 {/* Header */}
                 <header className="absolute top-0 inset-x-0 z-50">
-                    <div className="flex flex-col w-full bg-white/80 backdrop-blur-xl border-b border-neutral-200/50 relative">
-                        <div className="flex items-center justify-between px-4 sm:px-6 h-14 sm:h-16 max-w-lg mx-auto w-full">
+                    <div className="flex flex-col w-full bg-transparent relative pt-4">
+                        {/* Elegant Hairline Progress Bar */}
+                        <div className="w-full max-w-[390px] mx-auto px-4 absolute top-0 left-1/2 -translate-x-1/2 mt-1">
+                            <div className="w-full h-[4px] bg-black/5 rounded-full overflow-hidden">
+                                <motion.div
+                                    className="h-full bg-black origin-left rounded-full"
+                                    initial={{ scaleX: 0 }}
+                                    animate={{ scaleX: (currentQuestionIndex + 1) / (totalQuestions - 1) }}
+                                    transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="flex items-center justify-between px-4 sm:px-6 h-14 sm:h-16 max-w-[390px] mx-auto w-full">
                             <button
                                 onClick={handleBack}
-                                className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-white shadow-sm border border-neutral-200 text-neutral-600 active:scale-90 transition-transform"
+                                className="w-11 h-11 flex flex-col items-center justify-center rounded-full active:scale-90 transition-transform -ml-2"
                             >
-                                <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+                                <ChevronLeft className="w-6 h-6 text-neutral-800" strokeWidth={1.5} />
                             </button>
 
                             <div className="flex flex-col items-center justify-center">
-                                <div className="flex items-center gap-1.5 opacity-80">
-                                    <span className="text-[10px] sm:text-xs inline-block">
-                                        {CATEGORY_ICONS[question.category] || ""}
-                                    </span>
-                                    <span className="text-[9px] font-bold uppercase tracking-[0.25em] text-neutral-900">
-                                        {CATEGORY_TR[question.category] || question.category}
-                                    </span>
-                                </div>
-                                <div className="font-mono text-[9px] sm:text-[10px] tracking-widest text-neutral-400 mt-0.5 uppercase">
-                                    Adım <span className="text-neutral-900">{currentQuestionIndex + 1}</span> / {totalQuestions - 1}
-                                </div>
+                                {currentQuestionIndex > 0 && (
+                                    <div className="font-sans text-[11px] sm:text-[12px] font-medium tracking-[0.1em] text-neutral-500 uppercase">
+                                        Adım {currentQuestionIndex + 1} / {totalQuestions - 1}
+                                    </div>
+                                )}
                             </div>
 
-                            <div className="w-9 sm:w-10" />
-                        </div>
-                        {/* Elegant Hairline Progress Bar */}
-                        <div className="w-full h-[1.5px] bg-neutral-100 absolute bottom-0 left-0">
-                            <motion.div
-                                className="h-full bg-neutral-900 origin-left"
-                                initial={{ scaleX: 0 }}
-                                animate={{ scaleX: (currentQuestionIndex + 1) / (totalQuestions - 1) }}
-                                transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                            />
+                            <div className="w-11" />
                         </div>
                     </div>
                 </header>
 
                 {/* Main content */}
-                <main className="flex-1 flex flex-col w-full max-w-xl mx-auto pt-16 pb-4 h-full relative z-10 transition-all duration-500">
+                <main className="flex-1 flex flex-col w-full max-w-[390px] mx-auto pt-14 pb-2 h-full relative z-10 transition-all duration-500">
                     <AnimatePresence mode="popLayout">
                         <motion.div
                             key={currentQuestionIndex}
@@ -542,16 +615,43 @@ export default function QuizFlow() {
                             {/* Question — Compact Header */}
                             {/* Decorative Question Number */}
 
-                            <div className="flex flex-col items-center justify-center px-4 pt-4 sm:pt-6 pb-2 shrink-0 text-center relative">
+                            <div className={`flex flex-col items-center justify-center px-4 pb-1 shrink-0 text-center relative ${currentQuestionIndex === 0 ? "pt-0 mb-1" : "pt-4 sm:pt-6 mb-2"}`}>
                                 <DecorativeQuestionNumber number={currentQuestionIndex + 1} />
                                 <motion.div
                                     key={`title-wrapper-${currentQuestionIndex}`}
                                     initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ duration: 0.4, ease: "easeOut" }}
-                                    className="w-full max-w-md mx-auto flex flex-col items-center justify-center relative z-10"
+                                    className={`w-full max-w-md mx-auto flex flex-col items-center justify-center relative z-10 ${currentQuestionIndex === 0 ? "-mt-4" : ""}`}
                                 >
-                                    <CinematicFocusTitle text={question.scenario} />
+                                    {currentQuestionIndex === 0 ? (
+                                        <div className="relative w-full max-w-[390px] mx-auto mt-0 mb-3 flex flex-col items-center justify-center">
+                                            {/* Minimalist Top Anchor Label */}
+                                            <motion.div
+                                                initial={{ opacity: 0, y: 10 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                transition={{ duration: 0.8, ease: "easeOut", delay: 0.1 }}
+                                                className="mb-1.5 font-sans text-[11px] font-medium tracking-[0.15em] uppercase text-black/55"
+                                            >
+                                                ADIM 01 / 12
+                                            </motion.div>
+
+                                            {/* The Premium Typography Setup */}
+                                            <div className="relative z-10 w-full text-center px-4 flex flex-col items-center justify-center">
+                                                {/* Actual Title */}
+                                                <h1 className="text-[28px] font-serif tracking-[-0.01em] leading-[1.15] text-neutral-900 drop-shadow-[0_2px_4px_rgba(0,0,0,0.03)] mb-1 font-normal">
+                                                    Stil yolculuğuna<br />başlıyoruz.
+                                                </h1>
+
+                                                {/* Subtitle */}
+                                                <p className="text-[14px] font-sans text-black/60 tracking-[-0.01em] font-normal mt-0 max-w-[280px]">
+                                                    Sana en uygun kategoriyi seç.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <CinematicFocusTitle text={question.scenario} />
+                                    )}
                                     {/* Multi-Select Badge — hide on Q1 (gender) */}
                                     {currentQuestionIndex > 0 && (
                                         <motion.div
@@ -577,25 +677,25 @@ export default function QuizFlow() {
 
                             {/* Options */}
                             <div
-                                className="w-full px-4 flex flex-col justify-start pb-2 relative z-0 overflow-y-auto no-scrollbar"
+                                className="w-full px-5 flex flex-col justify-start pb-0 relative z-0 overflow-y-auto no-scrollbar"
                             >
                                 <motion.div
-                                    className={`w-full pb-4 ${question.options.some(o => o.image)
-                                        ? question.options.length > 3
-                                            ? "grid grid-cols-2 gap-2"        // 2x2 grid for 4+ image options
-                                            : "flex flex-col gap-2"            // vertical list for 3 or fewer images
-                                        : question.options.length > 4
-                                            ? "grid grid-cols-1 md:grid-cols-2 gap-2"
-                                            : "flex flex-col gap-2"
+                                    className={`w-full pb-0 ${question.layout === "large-image" || (question.options.some(o => o.image) && question.options.length > 3)
+                                        ? "grid grid-cols-2 gap-3"
+                                        : question.options.some(o => o.image)
+                                            ? "flex flex-col gap-3"
+                                            : question.options.length > 4
+                                                ? "grid grid-cols-1 md:grid-cols-2 gap-2"
+                                                : "flex flex-col gap-2"
                                         }`}
                                     variants={optionsContainerVariants}
                                     initial="hidden"
                                     animate="show"
                                 >
                                     {question.options.map((option, idx) => {
-                                        const totalOpts = question.options.length;
-                                        const hasImages = question.options.some(o => o.image);
-                                        const isLastAndOdd = hasImages && totalOpts % 2 !== 0 && idx === totalOpts - 1;
+                                        const isGrid = question.layout === "large-image";
+                                        // Specific to gender: if grid and index is 2 (3rd item, usually Unisex), span fully.
+                                        const isUnisexInGender = isGrid && question.category === "gender" && idx === 2;
 
                                         return (
                                             <QuizOptionCard
@@ -603,7 +703,8 @@ export default function QuizFlow() {
                                                 option={option}
                                                 isSelected={currentSelections.includes(option.value)}
                                                 onClick={() => handleOptionToggle(option)}
-                                                className={isLastAndOdd ? "col-span-full" : undefined}
+                                                className={isUnisexInGender ? "col-span-full w-full" : undefined}
+                                                layout={question.layout}
                                             />
                                         );
                                     })}
@@ -626,13 +727,10 @@ export default function QuizFlow() {
                                                 onClick={handleNext}
                                                 whileHover={{ scale: 1.02 }}
                                                 whileTap={{ scale: 0.96 }}
-                                                className="group relative w-full max-w-[280px] sm:max-w-[320px] mx-auto flex items-center justify-center gap-3 py-3.5 sm:py-4 rounded-full bg-neutral-900 text-white font-medium text-[13px] sm:text-[14px] tracking-[0.15em] uppercase shadow-[0_4px_14px_0_rgba(0,0,0,0.2)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.25)] transition-shadow duration-300 overflow-hidden"
+                                                className="group relative w-full h-[56px] mx-auto flex items-center justify-center gap-3 rounded-full bg-black text-white font-medium text-[15px] shadow-[0_10px_25px_rgba(0,0,0,0.25)] hover:shadow-[0_12px_30px_rgba(0,0,0,0.3)] transition-shadow duration-300 overflow-hidden"
                                             >
-                                                {/* Shimmer sweep effect */}
-                                                <div className="absolute inset-0 -translate-x-[150%] animate-[shimmer_2.5s_infinite] bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-12" />
-
-                                                <span className="relative z-10">{currentQuestionIndex === totalQuestions - 1 ? "Sonuçları Gör" : "Seçimi Onayla"}</span>
-                                                <ArrowRight className="w-4 h-4 transition-transform duration-300 ease-out group-hover:translate-x-1 relative z-10" />
+                                                <span className="relative z-10 font-sans tracking-tight">{currentQuestionIndex === totalQuestions - 1 ? "Sonuçları Gör" : "Seçimi Onayla"}</span>
+                                                <ArrowRight className="w-4 h-4 transition-transform duration-300 ease-out group-hover:translate-x-0.5 relative z-10" />
                                             </motion.button>
                                         </motion.div>
                                     ) : (
@@ -642,10 +740,10 @@ export default function QuizFlow() {
                                             animate={{ opacity: 1 }}
                                             exit={{ opacity: 0 }}
                                             transition={{ duration: 0.2 }}
-                                            className="w-full flex justify-center"
+                                            className="w-full flex justify-center px-5 pb-5"
                                         >
-                                            <div className="w-full max-w-[280px] sm:max-w-[320px] mx-auto flex items-center justify-center gap-2 py-3 sm:py-3.5 rounded-full border border-dashed border-neutral-300 text-neutral-400 text-xs sm:text-sm tracking-widest uppercase">
-                                                <span>Bir seçenek seçin</span>
+                                            <div className="w-full h-[56px] flex items-center justify-center rounded-full bg-black/20 text-black/60 font-medium text-[15px] cursor-not-allowed">
+                                                <span>Bir seçenek seç</span>
                                             </div>
                                         </motion.div>
                                     )}

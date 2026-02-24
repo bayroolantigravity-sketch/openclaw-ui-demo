@@ -29,17 +29,19 @@ export type Question = {
   category: FashionCategory;
   scenario: string;
   options: Option[];
+  layout?: "default" | "large-image";
 };
 
 // 1. Kök Soru (Branching Soru)
 export const initialQuestion: Question = {
   id: "q_gender",
   category: "gender",
-  scenario: "Kimin için alışveriş yapıyorsun?",
+  scenario: "Kategori seçiniz",
+  layout: "large-image",
   options: [
     { id: "gen_m", text: "Erkek Giyim", value: "male", image: "/quiz/profile_male_square.png", imagePosition: "center center" },
     { id: "gen_f", text: "Kadın Giyim", value: "female", image: "/quiz/profile_female_square.png", imagePosition: "center center" },
-    { id: "gen_u", text: "Unisex", value: "unisex", image: "/quiz/profile_unisex_square.png", imagePosition: "center center" }
+    { id: "gen_u", text: "Unisex", value: "unisex", image: "/quiz/profile_unisex_square.png", imagePosition: "center 25%" }
   ]
 };
 
@@ -182,11 +184,12 @@ export const maleQuestions: Question[] = [
   {
     id: "mq_style", category: "style",
     scenario: "Günlük genel tarzını nasıl tanımlarsın?",
+    layout: "large-image",
     options: [
-      { id: "msty_a", text: "Temiz Kesim, Smart Casual", value: "smart_casual", image: "/quiz/male_smart_casual.png" },
-      { id: "msty_b", text: "Sokak Modası / Hypebeast", value: "hypebeast", image: "/quiz/male_hypebeast.png" },
-      { id: "msty_c", text: "Rahat ve Klasik", value: "casual_classic", image: "/quiz/male_casual_classic.png" },
-      { id: "msty_d", text: "Techwear / Fonksiyonel", value: "techwear", image: "/quiz/male_techwear.png" }
+      { id: "msty_a", text: "Temiz Kesim, Smart Casual", value: "smart_casual", image: "/quiz/male_smart_casual.png", imagePosition: "center 10%" },
+      { id: "msty_b", text: "Sokak Modası / Hypebeast", value: "hypebeast", image: "/quiz/male_hypebeast.png", imagePosition: "center 10%" },
+      { id: "msty_c", text: "Rahat ve Klasik", value: "casual_classic", image: "/quiz/male_casual_classic.png", imagePosition: "center 10%" },
+      { id: "msty_d", text: "Techwear / Fonksiyonel", value: "techwear", image: "/quiz/male_techwear.png", imagePosition: "center 10%" }
     ]
   },
   {
